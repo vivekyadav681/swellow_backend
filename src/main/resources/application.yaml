@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: swellow
+  datasource:
+    url: jdbc:postgresql://localhost:5432/swellow
+    username: vivek
+    password: 
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: false
+
+# Custom JWT configuration
+jwt:
+  secret: "9YwE837dFksH917dGsd9274kJs9d8213Klsa974fHsd7a9"
+  expiration: 86400000 # 24 hours in milliseconds
