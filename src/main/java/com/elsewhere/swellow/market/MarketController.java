@@ -1,6 +1,8 @@
 package com.elsewhere.swellow.market;
 
 import com.elsewhere.swellow.transaction.Transaction;
+import com.elsewhere.swellow.wallet.TreasuryService;
+import com.elsewhere.swellow.wallet.Wallet;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +15,20 @@ import java.util.Map;
 public class MarketController {
 
     private final MarketService marketService;
+    private final TreasuryService treasuryService;
 
-    public MarketController(MarketService marketService) {
+    public MarketController(MarketService marketService, TreasuryService treasuryService) {
         this.marketService = marketService;
+        this.treasuryService = treasuryService;
+    }
+
+    @GetMapping("/treasury")
+    public ResponseEntity<Map<String, Object>> getTreasury() {
+        Wallet treasury = treasuryService.getTreasuryWallet();
+        return ResponseEntity.ok(Map.of(
+                "swlBalance", treasury.getSwlBalance(),
+                "cashBalance", treasury.getCashBalance()
+        ));
     }
 
     @PostMapping("/buy")

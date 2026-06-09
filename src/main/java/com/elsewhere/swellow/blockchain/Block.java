@@ -29,9 +29,6 @@ public class Block {
     private String currentHash;
 
     @Column(nullable = false)
-    private Long nonce;
-
-    @Column(nullable = false)
     private Long timestamp; // Epoch milliseconds
 
     @OneToMany(mappedBy = "block", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)

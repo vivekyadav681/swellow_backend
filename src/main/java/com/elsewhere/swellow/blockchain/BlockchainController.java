@@ -11,16 +11,9 @@ import java.util.Map;
 public class BlockchainController {
 
     private final BlockchainService blockchainService;
-    private final MiningService miningService;
 
-    public BlockchainController(BlockchainService blockchainService, MiningService miningService) {
+    public BlockchainController(BlockchainService blockchainService) {
         this.blockchainService = blockchainService;
-        this.miningService = miningService;
-    }
-
-    @PostMapping("/mine")
-    public ResponseEntity<Block> mine() {
-        return ResponseEntity.ok(miningService.minePendingTransactions());
     }
 
     @GetMapping("/blocks")

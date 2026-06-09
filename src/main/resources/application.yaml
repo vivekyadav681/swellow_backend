@@ -21,3 +21,11 @@ spring:
 jwt:
   secret: "9YwE837dFksH917dGsd9274kJs9d8213Klsa974fHsd7a9"
   expiration: 86400000 # 24 hours in milliseconds
+
+# Market & Blockchain refactoring configurations
+market:
+  price-factor: 0.001
+blockchain:
+  block-threshold: 10
+  block-creation-rate-ms: 60000
+

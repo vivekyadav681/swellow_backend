@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByStatus(TransactionStatus status);
+    long countByStatus(TransactionStatus status);
     List<Transaction> findBySenderWalletIdOrReceiverWalletId(Long senderWalletId, Long receiverWalletId);
     List<Transaction> findByBlockId(Long blockId);
 }

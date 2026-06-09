@@ -20,9 +20,13 @@ public class Wallet {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     @JsonIgnore
     private User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WalletType walletType;
 
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal cashBalance;

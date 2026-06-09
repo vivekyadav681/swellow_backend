@@ -71,6 +71,7 @@ public class AuthService {
                 .swlBalance(BigDecimal.ZERO)
                 .publicKey(keys.getPublicKey())
                 .privateKey(keys.getPrivateKey())
+                .walletType(com.elsewhere.swellow.wallet.WalletType.USER)
                 .build();
         user.setWallet(wallet);
 

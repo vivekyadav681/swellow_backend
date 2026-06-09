@@ -67,13 +67,13 @@ public class BlockchainService {
         return sb.toString();
     }
 
-    public static String calculateHashForBlock(Long blockIndex, Long timestamp, List<Transaction> transactions, String previousHash, Long nonce) {
-        String data = blockIndex + "-" + timestamp + "-" + getTransactionDataString(transactions) + "-" + previousHash + "-" + nonce;
+    public static String calculateHashForBlock(Long blockIndex, Long timestamp, List<Transaction> transactions, String previousHash) {
+        String data = blockIndex + "-" + timestamp + "-" + getTransactionDataString(transactions) + "-" + previousHash;
         return HashUtil.applySha256(data);
     }
 
     public static String calculateBlockHash(Block block) {
-        return calculateHashForBlock(block.getBlockIndex(), block.getTimestamp(), block.getTransactions(), block.getPreviousHash(), block.getNonce());
+        return calculateHashForBlock(block.getBlockIndex(), block.getTimestamp(), block.getTransactions(), block.getPreviousHash());
     }
 
     public boolean validateChain() {
@@ -91,12 +91,7 @@ public class BlockchainService {
                 return false;
             }
 
-            // 2. Verify PoW difficulty
-            if (!currentBlock.getCurrentHash().startsWith("0000")) {
-                return false;
-            }
-
-            // 3. Verify linkage to previous block
+            // 2. Verify linkage to previous block
             if (i > 0) {
                 Block previousBlock = chain.get(i - 1);
                 if (!currentBlock.getPreviousHash().equals(previousBlock.getCurrentHash())) {
@@ -109,26 +104,30 @@ public class BlockchainService {
                 }
             }
 
-            // 4. Verify signatures of transactions inside the block
+            // 3. Verify signatures of transactions inside the block
             for (Transaction tx : currentBlock.getTransactions()) {
-                if (tx.getSenderWalletId() != null) {
-                    // Verify signature against sender's public key
-                    Wallet senderWallet = walletRepository.findById(tx.getSenderWalletId()).orElse(null);
-                    if (senderWallet == null) {
+                if (tx.getSenderWalletId() == null || tx.getReceiverWalletId() == null) {
+                    return false;
+                }
+
+                Wallet senderWallet = walletRepository.findById(tx.getSenderWalletId()).orElse(null);
+                if (senderWallet == null) {
+                    return false;
+                }
+
+                if (senderWallet.getWalletType() == com.elsewhere.swellow.wallet.WalletType.TREASURY) {
+                    // Treasury signature rule
+                    if (!"TREASURY_TRANSFER".equals(tx.getSignature())) {
                         return false;
                     }
-
-                    String receiverVal = tx.getReceiverWalletId() == null ? "null" : tx.getReceiverWalletId().toString();
+                } else {
+                    // Verify ECDSA signature against sender's public key
+                    String receiverVal = tx.getReceiverWalletId().toString();
                     String formattedAmount = tx.getAmount().setScale(8, RoundingMode.HALF_UP).toPlainString();
                     String signedData = tx.getSenderWalletId() + ":" + receiverVal + ":" + formattedAmount + ":" + tx.getTimestamp().toEpochMilli();
 
                     boolean isSigValid = CryptoUtil.verify(signedData, tx.getSignature(), senderWallet.getPublicKey());
                     if (!isSigValid) {
-                        return false;
-                    }
-                } else {
-                    // System transaction (Buy or Reward)
-                    if (!"SYSTEM_BUY".equals(tx.getSignature()) && !"SYSTEM_REWARD".equals(tx.getSignature())) {
                         return false;
                     }
                 }

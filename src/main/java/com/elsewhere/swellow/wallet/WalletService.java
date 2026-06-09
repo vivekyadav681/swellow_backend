@@ -47,35 +47,23 @@ public class WalletService {
         walletRepository.save(receiver);
     }
 
-    @Transactional
-    public void creditMiningReward(Long walletId, BigDecimal reward) {
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new IllegalArgumentException("Wallet not found"));
-        wallet.setSwlBalance(wallet.getSwlBalance().add(reward));
-        walletRepository.save(wallet);
-    }
 
     @Transactional
-    public void updateBalancesForBuy(Long walletId, BigDecimal cashCost, BigDecimal swlAmount) {
+    public void deductCash(Long walletId, BigDecimal cashAmount) {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new IllegalArgumentException("Wallet not found"));
-        if (wallet.getCashBalance().compareTo(cashCost) < 0) {
+        if (wallet.getCashBalance().compareTo(cashAmount) < 0) {
             throw new IllegalArgumentException("Insufficient cash balance");
         }
-        wallet.setCashBalance(wallet.getCashBalance().subtract(cashCost));
-        wallet.setSwlBalance(wallet.getSwlBalance().add(swlAmount));
+        wallet.setCashBalance(wallet.getCashBalance().subtract(cashAmount));
         walletRepository.save(wallet);
     }
 
     @Transactional
-    public void updateBalancesForSell(Long walletId, BigDecimal cashEarned, BigDecimal swlAmount) {
+    public void creditCash(Long walletId, BigDecimal cashAmount) {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new IllegalArgumentException("Wallet not found"));
-        if (wallet.getSwlBalance().compareTo(swlAmount) < 0) {
-            throw new IllegalArgumentException("Insufficient SWL balance");
-        }
-        wallet.setSwlBalance(wallet.getSwlBalance().subtract(swlAmount));
-        wallet.setCashBalance(wallet.getCashBalance().add(cashEarned));
+        wallet.setCashBalance(wallet.getCashBalance().add(cashAmount));
         walletRepository.save(wallet);
     }
 }

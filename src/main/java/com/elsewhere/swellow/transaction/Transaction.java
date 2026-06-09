@@ -20,8 +20,10 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long senderWalletId; // null for system minting / buys
-    private Long receiverWalletId; // null for system burning / sells
+    @Column(nullable = false)
+    private Long senderWalletId;
+    @Column(nullable = false)
+    private Long receiverWalletId;
 
     @Column(nullable = false, precision = 19, scale = 8)
     private BigDecimal amount;

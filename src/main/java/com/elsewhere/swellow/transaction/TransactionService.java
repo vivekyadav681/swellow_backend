@@ -17,15 +17,18 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletService walletService;
     private final WalletRepository walletRepository;
+    private final com.elsewhere.swellow.blockchain.BlockCreationService blockCreationService;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             WalletService walletService,
-            WalletRepository walletRepository
+            WalletRepository walletRepository,
+            com.elsewhere.swellow.blockchain.BlockCreationService blockCreationService
     ) {
         this.transactionRepository = transactionRepository;
         this.walletService = walletService;
         this.walletRepository = walletRepository;
+        this.blockCreationService = blockCreationService;
     }
 
     public List<Transaction> getTransactionsForCurrentUser() {
@@ -75,6 +78,8 @@ public class TransactionService {
                 .timestamp(now)
                 .build();
 
-        return transactionRepository.save(transaction);
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        blockCreationService.triggerBlockCreationIfThresholdMet();
+        return savedTransaction;
     }
 }
